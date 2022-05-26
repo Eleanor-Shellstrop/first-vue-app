@@ -50,19 +50,26 @@
             })
 
             app.component('login-form', {
+                // Props passed to children are immutable
                 template: `
                     <form @submit.prevent="handleSubmit">
                         <h1>{{ title }}</h1>
-                        <input type="email" v-model="email"/>
-                        <input type="Password" v-model="password"/>
+                        <custom-input v-model="email" :label="emailLabel" />
+                        <custom-input v-model="password" :label="passwordLabel" />
                         <button>Log in</button>
                     </form>
                 `,
+                components: [
+                    'custom-input'
+                ],
                 data() {
+                    // Can only be changed within the same component
                     return {
                         title: 'Login Form',
                         email: '',
-                        password: ''
+                        password: '',
+                        emailLabel: 'Email',
+                        passwordLabel: 'Password'
                     }
                 },
                 methods: {
@@ -76,9 +83,26 @@
                 template: `
                     <label>
                         {{ label }}
-                        <input type="text">
+                        <input type="text" v-model="inputValue">
                     </label>
-                `
+                `,
+                props: ['label', 'modelValue'],
+                computed: {
+                    inputValue: {
+                        get() {
+                            return this.modelValue
+                        },
+                        set(value) {
+                            // Emit event to the parent component
+                            this.$emit('update:modelValue', value)
+                        }
+                    }
+                },
+                // data() {
+                //     return {
+                //         inputValue: ''
+                //     }
+                // }
             })
 
             app.mount('#app')
